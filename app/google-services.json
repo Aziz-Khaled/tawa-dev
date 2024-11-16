@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "704701252100",
+    "project_id": "tawa-dev",
+    "storage_bucket": "tawa-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704701252100:android:bf42e1907384c7ed456b51",
+        "android_client_info": {
+          "package_name": "com.example.mobile_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKfkpEw_gP92ev8Mg-rPEOtUTVPa3lUOQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

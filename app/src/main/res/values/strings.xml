@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">mobile_project</string>
+    <string name="clientIdGoogleAuth">704701252100-c8j7ufnh98fg91ri3lvqaqtr3vvsikfs.apps.googleusercontent.com</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
