@@ -1,49 +1,63 @@
 package com.example.mobile_project;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
-import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import com.example.mobile_project.databinding.ActivityWelcomePageBinding;
+
+
 
 public class WelcomePage extends AppCompatActivity {
 
-    private TextView textView6;
-    private FirebaseFirestore firestore;
-    private FirebaseUser user;
+    private ActivityWelcomePageBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_welcome_page);
-        textView6 = findViewById(R.id.textView6);
-        firestore = FirebaseFirestore.getInstance();
-        user = FirebaseAuth.getInstance().getCurrentUser();
+        // Set up View Binding
+        binding = ActivityWelcomePageBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Load the default fragment (HomeFragment)
+        if (savedInstanceState == null) {
+            replaceFragment(new HomeFragment());
+        }
+        // Set up Bottom Navigation
+        setupBottomNavigation();
     }
 
-    private void fetchAndDisplayUserName() {
-        String userEmail = user.getEmail();
-        firestore.collection("internship_seeker")
-                .whereEqualTo("email", userEmail)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        // Get the first document (should only be one)
-                        DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+    private void setupBottomNavigation() {
+        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
 
-                        // Get the user's name and display it
-                        String userName = document.getString("name");
-                        textView6.setText("Welcome, " + userName + "!");
-                    } else {
-                        textView6.setText("Welcome, User!");
-                    }
-                })
-                .addOnFailureListener(e -> textView6.setText("Error fetching user data!"));
+            if (item.getItemId() == R.id.home) {
+                selectedFragment = new HomeFragment();
+                Log.d("Navigation", "Home Fragment Selected");
+            } else if (item.getItemId() == R.id.profile) {
+                selectedFragment = new ProfileFragment();
+                Log.d("Navigation", "Profile Fragment Selected");
+            } else if (item.getItemId() == R.id.notifications) {
+                selectedFragment = new NotifcationFragment();
+                Log.d("Navigation", "Notifications Fragment Selected");
+            }
+
+            if (selectedFragment != null) {
+                replaceFragment(selectedFragment);
+                return true;
+            }
+
+            return false;
+        });
+    }
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, fragment)
+                .commit();
     }
 }
