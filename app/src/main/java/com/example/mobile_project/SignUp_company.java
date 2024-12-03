@@ -2,14 +2,12 @@ package com.example.mobile_project;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,14 +25,15 @@ public class SignUp_company extends AppCompatActivity {
     private EditText nameCompany, email, password, phoneNumber;
     private CheckBox termsCheckBox;
     private FirebaseFirestore firestore;
+    private FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sign_up_company);
 
         firestore = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         // Bind UI elements
         nameCompany = findViewById(R.id.nameCompany);
@@ -47,7 +46,7 @@ public class SignUp_company extends AppCompatActivity {
 
         // Navigate to login page
         loginNavigate.setOnClickListener(v -> {
-            Intent intent = new Intent(SignUp_company.this, Login_company.class); // Create Login_company if needed
+            Intent intent = new Intent(SignUp_company.this, Login_client.class);
             startActivity(intent);
         });
 
@@ -69,11 +68,12 @@ public class SignUp_company extends AppCompatActivity {
             }
 
             // Sign up with Firebase Authentication
-            FirebaseAuth.getInstance().createUserWithEmailAndPassword(emailValue, passwordValue)
+            auth.createUserWithEmailAndPassword(emailValue, passwordValue)
                     .addOnCompleteListener(SignUp_company.this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
+                                // Save data to Firestore
                                 saveCompanyData(name, emailValue, phone);
                                 Intent intent = new Intent(SignUp_company.this, WelcomePage.class); // Adjust WelcomePage if needed
                                 startActivity(intent);
@@ -88,14 +88,20 @@ public class SignUp_company extends AppCompatActivity {
     }
 
     private void saveCompanyData(String name, String email, String phone) {
-        // Map company details to Firestore
-        Map<String, Object> companyData = new HashMap<>();
-        companyData.put("name", name);
-        companyData.put("email", email);
-        companyData.put("phone", phone);
+        // Get the current user's unique ID
+        String userId = auth.getCurrentUser().getUid();
 
-        firestore.collection("companies").add(companyData)
-                .addOnSuccessListener(documentReference ->
+        // Map company details to Firestore with role as "company"
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("name", name);
+        userData.put("email", email);
+        userData.put("phone", phone);
+        userData.put("role", "company"); // Add role field
+        userData.put("userId", userId); // Store the userId for reference
+
+        // Save to Firestore in "users" collection
+        firestore.collection("users").document(userId).set(userData)
+                .addOnSuccessListener(aVoid ->
                         Toast.makeText(SignUp_company.this, "Company registered successfully!", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e ->
                         Toast.makeText(SignUp_company.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());

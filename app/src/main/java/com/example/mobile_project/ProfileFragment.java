@@ -22,7 +22,6 @@ public class ProfileFragment extends Fragment {
     private TextView profileUsername, EmailUsername;
     private FirebaseFirestore firestore;
     private FirebaseUser user;
-    private Button logout ;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,14 +36,13 @@ public class ProfileFragment extends Fragment {
 
         firestore = FirebaseFirestore.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
+
         profileUsername = view.findViewById(R.id.profileUsername);
         EmailUsername = view.findViewById(R.id.userEmail);
 
         Button logout = view.findViewById(R.id.logout);
         logout.setOnClickListener(v -> {
-
             FirebaseAuth.getInstance().signOut();
-
 
             Intent intent = new Intent(getContext(), Login_client.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -55,13 +53,13 @@ public class ProfileFragment extends Fragment {
         fetchAndDisplayUserData();
     }
 
-
     private void fetchAndDisplayUserData() {
         if (user != null) {
             String userEmail = user.getEmail();
             EmailUsername.setText(userEmail);
 
-            firestore.collection("internship_seeker")
+            // Fetch user data from the 'users' collection
+            firestore.collection("users")
                     .whereEqualTo("email", userEmail)
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -69,7 +67,7 @@ public class ProfileFragment extends Fragment {
                             DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
                             String userName = document.getString("name");
 
-
+                            // Set the user's name in the profileUsername TextView
                             profileUsername.setText(userName);
                         } else {
                             profileUsername.setText("User");

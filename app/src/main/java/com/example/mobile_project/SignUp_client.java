@@ -77,12 +77,11 @@ public class SignUp_client extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-
-                                    post();
+                                    post(); // Save the user details to Firestore
                                     Intent intent = new Intent(SignUp_client.this, WelcomePage.class);
                                     startActivity(intent);
+                                    finish();
                                 } else {
-
                                     String errorMessage = task.getException() != null ? task.getException().getMessage() : "Unknown error";
                                     if (errorMessage.contains("email address is already in use")) {
                                         Toast.makeText(SignUp_client.this, "This email is already registered. Please log in.", Toast.LENGTH_SHORT).show();
@@ -94,27 +93,31 @@ public class SignUp_client extends AppCompatActivity {
                         });
             }
         });
-
     }
 
     private void post() {
         String nameValue = name.getText().toString();
-        String emailValue = email.getText().toString() ;
+        String emailValue = email.getText().toString();
         String localisationValue = localisation.getText().toString();
         String collegeValue = college.getText().toString();
         String degreeValue = degree.getText().toString();
         String specialityValue = speciality.getText().toString();
 
-        Map<String, Object> internship_seeker = new HashMap<>();
-        internship_seeker.put("name", nameValue);
-        internship_seeker.put("email", emailValue);
-        internship_seeker.put("localisation", localisationValue);
-        internship_seeker.put("college", collegeValue);
-        internship_seeker.put("degree", degreeValue);
-        internship_seeker.put("speciality", specialityValue);
+        // Map user data
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("name", nameValue);
+        userData.put("email", emailValue);
+        userData.put("localisation", localisationValue);
+        userData.put("college", collegeValue);
+        userData.put("degree", degreeValue);
+        userData.put("speciality", specialityValue);
+        userData.put("role", "internship_seeker"); // Assign role
 
-        firestore.collection("internship_seeker").add(internship_seeker)
-                .addOnSuccessListener(documentReference -> Toast.makeText(SignUp_client.this, "Sign Up Successful!", Toast.LENGTH_SHORT).show())
-                .addOnFailureListener(e -> Toast.makeText(SignUp_client.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        // Save to 'users' collection
+        firestore.collection("users").add(userData)
+                .addOnSuccessListener(documentReference ->
+                        Toast.makeText(SignUp_client.this, "Sign Up Successful!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e ->
+                        Toast.makeText(SignUp_client.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }
