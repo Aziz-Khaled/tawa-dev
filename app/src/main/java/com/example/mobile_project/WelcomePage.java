@@ -41,8 +41,8 @@ public class WelcomePage extends AppCompatActivity {
             } else if (item.getItemId() == R.id.profile) {
                 selectedFragment = new ProfileFragment();
                 Log.d("Navigation", "Profile Fragment Selected");
-            } else if (item.getItemId() == R.id.notifications) {
-                selectedFragment = new NotifcationFragment();
+            } else if (item.getItemId() == R.id.Add) {
+                selectedFragment = new PostFragment();
                 Log.d("Navigation", "Notifications Fragment Selected");
             }
 
